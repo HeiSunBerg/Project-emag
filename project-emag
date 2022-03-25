@@ -58,7 +58,7 @@ for i in range(len(mask[0])):
 C = []
 pchange = []
 m, n = xx1.shape
-niter = 300
+niter = 500
 
 for kk in range(niter):
     for ii in range(m):
