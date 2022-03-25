@@ -1,0 +1,105 @@
+import numpy as np # linear algebra
+import matplotlib.pyplot as plt
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import scipy.constants
+import math
+eps0 = scipy.constants.epsilon_0
+pi = scipy.constants.pi
+e = scipy.constants.elementary_charge
+G = scipy.constants.gravitational_constant
+m_e = scipy.constants.m_e
+m_p = scipy.constants.m_p
+k=1/(4*pi*eps0)
+h = 1 #input
+W = 1 #input
+d = 1 #input
+s = 1 #input
+g = 1 #input
+accu = d/10 #ความละเอียด
+Wbox = 2*s+4*W+3*g
+Hbox = 2*h+d
+a = 1
+b = 3
+xx = [int(round(ii*1000))/1000 for ii in list(np.linspace(-Wbox/2, Wbox/2, int(Wbox/accu)+1))]
+yy = [int(round(ii*1000))/1000 for ii in list(np.linspace(-Hbox/2, Hbox/2, int(Hbox/accu)+1))]
+xx1, yy1 = np.meshgrid(xx,yy)
+vv = np.zeros(xx1.shape)
+if (a == 1):
+    vv[np.where((yy1== d/2) & (xx1>=-(Wbox/2)+s) & (xx1<=-(Wbox/2)+s+W))] = 1 #1
+elif (a == 2):
+    vv[np.where((yy1== d/2) & (xx1>=-(Wbox/2)+s+W+g) & (xx1<=-(Wbox/2)+s+2*W+g))] = 1 #2
+elif (a == 3):
+    vv[np.where((yy1== d/2) & (xx1>=(Wbox/2)-s-2*W-g) & (xx1<=(Wbox/2)-s-2*W-g))]   = 1 #3
+elif (a == 4):
+    vv[np.where((yy1== -d/2) & (xx1>=-(Wbox/2)+s) & (xx1<=-(Wbox/2)+s+W))] = 1 #4
+elif (a == 5):
+    vv[np.where((yy1== -d/2) & (xx1>=-(Wbox/2)+s+W+g) & (xx1<=-(Wbox/2)+s+2*W+g))] = 1#5
+elif (a == 6):
+    vv[np.where((yy1== -d/2) & (xx1>=(Wbox/2)-s-2*W-g) & (xx1<=(Wbox/2)-s-2*W-g))] = 1 #6
+
+mask = np.where(((yy1== d/2) & (xx1>=-(Wbox/2)+s) & (xx1<=-(Wbox/2)+s+W))|\
+                ((yy1== d/2) & (xx1>=-(Wbox/2)+s+W+g) & (xx1<=-(Wbox/2)+s+W+g+W))|\
+                ((yy1== d/2) & (xx1>=-(Wbox/2)+s+W+g+W+g) & (xx1<=-(Wbox/2)+s+W+g+W+g+W))|\
+                ((yy1== d/2) & (xx1>=-(Wbox/2)+s+W+g+W+g+W+g) & (xx1<=-(Wbox/2)+s+W+g+W+g+W+g+W))|\
+
+                ((yy1== -d/2) & (xx1>=-(Wbox/2)+s) & (xx1<=-(Wbox/2)+s+W))|\
+                ((yy1== -d/2) & (xx1>=-(Wbox/2)+s+W+g) & (xx1<=-(Wbox/2)+s+W+g+W))|\
+                ((yy1== -d/2) & (xx1>=-(Wbox/2)+s+W+g+W+g) & (xx1<=-(Wbox/2)+s+W+g+W+g+W))|\
+                ((yy1== -d/2) & (xx1>=-(Wbox/2)+s+W+g+W+g+W+g) & (xx1<=-(Wbox/2)+s+W+g+W+g+W+g+W))|\
+                
+                
+                ((yy1==  Hbox/2) & (xx1>= -Wbox/2) & (xx1<= Wbox/2)) | \
+                ((yy1== -Hbox/2) & (xx1>= -Wbox/2) & (xx1<= Wbox/2)) | \
+                ((xx1==  Wbox/2) & (yy1>= -Hbox/2) & (yy1<= Hbox/2)) | \
+                ((xx1== -Wbox/2) & (yy1>= -Hbox/2) & (yy1<= Hbox/2)) )
+maskx = []
+for i in range(len(mask[0])):
+    maskx.append((mask[0][i],mask[1][i]))
+C = []
+pchange = []
+m, n = xx1.shape
+niter = 300
+
+for kk in range(niter):
+    for ii in range(m):
+        for jj in range(n):
+            if (ii,jj) not in maskx:
+                vv[ii,jj] = 0.25* (vv[ii-1,jj]+vv[ii+1,jj]+vv[ii,jj-1]+vv[ii,jj+1])
+    if (b == 1):
+        position_up = vv[np.where((yy1==int(round((d/2+accu)*1000))/1000) & (xx1>=-(Wbox/2)+s) & (xx1<=-(Wbox/2)+s+W))]  #1
+        position_down = vv[np.where((yy1==int(round((d/2-accu)*1000))/1000) & (xx1>=-(Wbox/2)+s) & (xx1<=-(Wbox/2)+s+W))]
+    elif (b == 2):
+        position_up = vv[np.where((yy1==int(round((d/2+accu)*1000))/1000) & (xx1>=-(Wbox/2)+s+W+g) & (xx1<=-(Wbox/2)+s+W+g+W))]  #2
+        position_down = vv[np.where((yy1==int(round((d/2-accu)*1000))/1000) & (xx1>=-(Wbox/2)+s+W+g) & (xx1<=-(Wbox/2)+s+W+g+W))]
+    elif (b == 3):
+        position_up = vv[np.where((yy1==int(round((d/2+accu)*1000))/1000) & (xx1>=-(Wbox/2)+s+W+g+W+g) & (xx1<=-(Wbox/2)+s+W+g+W+g+W))]  #3
+        position_down = vv[np.where((yy1==int(round((d/2-accu)*1000))/1000) & (xx1>=-(Wbox/2)+s+W+g+W+g) & (xx1<=-(Wbox/2)+s+W+g+W+g+W))]
+    elif (b == 4):
+        position_up = vv[np.where((yy1==int(round((-d/2+accu)*1000))/1000) & (xx1>=-(Wbox/2)+s) & (xx1<=-(Wbox/2)+s+W))]  #4
+        position_down = vv[np.where((yy1==int(round((-d/2-accu)*1000))/1000) & (xx1>=-(Wbox/2)+s) & (xx1<=-(Wbox/2)+s+W))]
+    elif (b == 5):
+        position_up = vv[np.where((yy1==int(round((-d/2+accu)*1000))/1000) & (xx1>=-(Wbox/2)+s+W+g) & (xx1<=-(Wbox/2)+s+W+g+W))]  #5
+        position_down = vv[np.where((yy1==int(round((-d/2-accu)*1000))/1000) & (xx1>=-(Wbox/2)+s+W+g) & (xx1<=-(Wbox/2)+s+W+g+W))]
+    elif (b == 6):
+        position_up = vv[np.where((yy1==int(round((-d/2+accu)*1000))/1000) & (xx1>=-(Wbox/2)+s+W+g+W+g) & (xx1<=-(Wbox/2)+s+W+g+W+g+W))]  #6
+        position_down = vv[np.where((yy1==int(round((-d/2-accu)*1000))/1000) & (xx1>=-(Wbox/2)+s+W+g+W+g) & (xx1<=-(Wbox/2)+s+W+g+W+g+W))]
+    rhos = (0-position_up)
+    rhos = rhos +(0-position_down)
+    #rhos ที่ได้เป็น delta V เท่านั้นต้องหารด้วย delta ระยะทาง ถึงจะได้สนามไฟฟ้า
+    rhos = eps0*rhos/accu
+    #ความหนาแน่นประจุค่าแรกกับค่าสุดท้าย อยู่ที่ขอบแผ่น เป็นค่าของแค่ครึ่งชิ้นเท่านั้น
+    C.append(accu*(rhos[1:-1].sum()+0.5*(rhos[0]+rhos[-1])))#edited rhos[1]=>rhos[0] on 28-Feb-2022
+    if kk > 0:
+        pchange.append((C[-2]-C[-1])*100/C[-2])
+np.save('output.npy', vv)
+print('Computed C is ',-accu*C[-1]*1e15,'fF/m')
+#ส่วนกราฟ
+plt.plot(-accu*np.array(C)*1e15)
+plt.grid()
+plt.xlabel('# iteration')
+plt.ylabel('Capacitance [fF/m]')
+plt.title('Convergence of the iterative method')
+plt.show()
+print('The last capacitance is ',C[-1],'. The last percent change is ',pchange[-1],'.')
+plt.imshow(25*(vv+5),origin='lower')
+plt.show()
